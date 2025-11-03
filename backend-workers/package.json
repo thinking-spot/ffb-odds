@@ -1,0 +1,24 @@
+{
+  "name": "ffb-odds-workers",
+  "version": "1.0.0",
+  "description": "Fantasy Football Vegas Odds - Cloudflare Workers Backend",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "d1:create": "wrangler d1 create ffb-odds-db",
+    "d1:init": "wrangler d1 execute ffb-odds-db --file=../database/schema.sql",
+    "d1:query": "wrangler d1 execute ffb-odds-db --command",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "^3.12.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20231218.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.22.0"
+  }
+}

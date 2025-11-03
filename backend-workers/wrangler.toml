@@ -1,0 +1,31 @@
+name = "ffb-odds-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# D1 Database Binding
+[[d1_databases]]
+binding = "DB"
+database_name = "ffb-odds-db"
+database_id = "TBD"  # Will be set after: wrangler d1 create ffb-odds-db
+
+# KV Namespace for Caching
+[[kv_namespaces]]
+binding = "CACHE"
+id = "TBD"  # Will be set after: wrangler kv:namespace create CACHE
+
+# Cron Triggers for Daily Updates
+# 10am ET = 2pm UTC (EST - winter) or 3pm UTC (EDT - summer)
+# Using 3pm UTC to cover both timezones (will be 10am EDT, 11am EST)
+[triggers]
+crons = ["0 15 * * *"]  # 3pm UTC = 10am EST / 11am EDT
+
+# Environment Variables (non-secret)
+[vars]
+ENVIRONMENT = "production"
+CURRENT_SEASON = "2024"
+DEFAULT_WEEK = "10"
+
+# Secrets (set via: wrangler secret put <NAME>)
+# ODDS_API_KEY
+# NFL_API_KEY
+# NFL_API_HOST
