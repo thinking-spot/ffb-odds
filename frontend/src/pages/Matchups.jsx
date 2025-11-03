@@ -64,10 +64,10 @@ function Matchups() {
       <div className="matchups-header">
         <h1>Week {week} Matchups</h1>
         <div className="week-selector">
-          <button onClick={() => week > 1 && window.location.href = `?league=${leagueId}&week=${week - 1}`}>
+          <button onClick={() => { if (week > 1) window.location.href = `?league=${leagueId}&week=${week - 1}` }}>
             ← Prev Week
           </button>
-          <button onClick={() => week < 17 && window.location.href = `?league=${leagueId}&week=${week + 1}`}>
+          <button onClick={() => { if (week < 17) window.location.href = `?league=${leagueId}&week=${week + 1}` }}>
             Next Week →
           </button>
         </div>
