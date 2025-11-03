@@ -1,0 +1,200 @@
+.rankings {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.rankings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sort-controls label {
+  font-weight: 500;
+}
+
+.sort-controls select {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #333;
+  background-color: #1a1a1a;
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 0.95rem;
+}
+
+.rankings-table-container {
+  overflow-x: auto;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  border: 1px solid #333;
+  margin-bottom: 2rem;
+}
+
+.rankings-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rankings-table th {
+  background-color: #2a2a2a;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #333;
+}
+
+.rankings-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #333;
+}
+
+.rankings-table tbody tr:hover {
+  background-color: #2a2a2a;
+}
+
+.rank-cell {
+  font-weight: bold;
+  color: #646cff;
+  font-size: 1.1rem;
+}
+
+.team-cell {
+  min-width: 200px;
+}
+
+.team-name {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.team-manager {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.lucky {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.unlucky {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.neutral {
+  color: #888;
+}
+
+.efficiency-cell {
+  font-weight: 600;
+  color: #646cff;
+}
+
+.playoff-cell {
+  min-width: 150px;
+}
+
+.playoff-bar-container {
+  position: relative;
+  width: 100%;
+  height: 24px;
+  background-color: rgba(100, 108, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.playoff-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background-color: #646cff;
+  transition: width 0.3s ease;
+}
+
+.playoff-text {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-weight: 600;
+  font-size: 0.85rem;
+  z-index: 1;
+}
+
+.legend {
+  margin-top: 2rem;
+}
+
+.legend ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.legend li {
+  color: #888;
+  line-height: 1.5;
+}
+
+.legend strong {
+  color: rgba(255, 255, 255, 0.87);
+}
+
+@media (prefers-color-scheme: light) {
+  .sort-controls select {
+    background-color: #f9f9f9;
+    border-color: #ddd;
+    color: #213547;
+  }
+
+  .rankings-table-container {
+    background-color: #f9f9f9;
+    border-color: #ddd;
+  }
+
+  .rankings-table th {
+    background-color: #e9e9e9;
+    border-bottom-color: #ddd;
+  }
+
+  .rankings-table td {
+    border-bottom-color: #ddd;
+  }
+
+  .rankings-table tbody tr:hover {
+    background-color: #e9e9e9;
+  }
+
+  .legend strong {
+    color: #213547;
+  }
+}
+
+@media (max-width: 1024px) {
+  .rankings-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .rankings-table {
+    font-size: 0.85rem;
+  }
+
+  .rankings-table th,
+  .rankings-table td {
+    padding: 0.75rem 0.5rem;
+  }
+}
