@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { addLeague } from '../services/api'
+import { addLeague, getCurrentUser, logout, getYahooAuthUrl } from '../services/api'
 import './Home.css'
 
 function Home() {
@@ -8,7 +8,45 @@ function Home() {
   const [season, setSeason] = useState(2024)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [user, setUser] = useState(null)
+  const [checkingAuth, setCheckingAuth] = useState(true)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    // Check if user is authenticated
+    const checkAuth = async () => {
+      const sessionId = localStorage.getItem('yahoo_session')
+      if (sessionId) {
+        try {
+          const response = await getCurrentUser(sessionId)
+          setUser(response.data)
+        } catch (err) {
+          // Session invalid, remove it
+          localStorage.removeItem('yahoo_session')
+        }
+      }
+      setCheckingAuth(false)
+    }
+
+    checkAuth()
+  }, [])
+
+  const handleConnectYahoo = () => {
+    window.location.href = getYahooAuthUrl()
+  }
+
+  const handleLogout = async () => {
+    const sessionId = localStorage.getItem('yahoo_session')
+    if (sessionId) {
+      try {
+        await logout(sessionId)
+      } catch (err) {
+        console.error('Logout error:', err)
+      }
+    }
+    localStorage.removeItem('yahoo_session')
+    setUser(null)
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -34,10 +72,47 @@ function Home() {
         </p>
       </div>
 
+      {!checkingAuth && !user && (
+        <div className="card" style={{ backgroundColor: '#fff3cd', borderColor: '#ffc107' }}>
+          <h3 style={{ marginTop: 0, color: '#856404' }}>🔐 Connect Your Yahoo Account</h3>
+          <p style={{ color: '#856404', marginBottom: '1rem' }}>
+            To access <strong>private leagues</strong>, connect your Yahoo Fantasy account.
+            Public leagues can still be added without connecting.
+          </p>
+          <button
+            onClick={handleConnectYahoo}
+            className="submit-button"
+            style={{ backgroundColor: '#5f01d1', borderColor: '#5f01d1' }}
+          >
+            Connect Yahoo Account
+          </button>
+        </div>
+      )}
+
+      {!checkingAuth && user && (
+        <div className="card" style={{ backgroundColor: '#d4edda', borderColor: '#28a745' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h3 style={{ marginTop: 0, color: '#155724' }}>✓ Yahoo Account Connected</h3>
+              <p style={{ color: '#155724', margin: 0 }}>
+                You can now add both public and private leagues!
+              </p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="submit-button"
+              style={{ backgroundColor: '#dc3545', borderColor: '#dc3545' }}
+            >
+              Disconnect
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="card">
         <h2>Get Started</h2>
         <p style={{ marginBottom: '1.5rem', color: '#888' }}>
-          Enter your Yahoo public league ID to see odds, projections, and efficiency rankings
+          Enter your Yahoo league ID to see odds, projections, and efficiency rankings
         </p>
 
         {error && <div className="error">{error}</div>}
@@ -104,7 +179,8 @@ function Home() {
       <div className="card">
         <h3>How It Works</h3>
         <ol className="how-it-works">
-          <li>Enter your Yahoo public league ID</li>
+          <li>Connect your Yahoo account (required for private leagues)</li>
+          <li>Enter your Yahoo league ID (public or private)</li>
           <li>We fetch your league's rosters and matchups</li>
           <li>Vegas odds are pulled for all NFL games</li>
           <li>Player props + team totals are converted to fantasy projections</li>

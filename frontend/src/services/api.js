@@ -11,7 +11,9 @@ const api = axios.create({
 
 // Leagues
 export const addLeague = (leagueId, season = 2024) => {
-  return api.post(`/leagues/?league_id=${leagueId}&season=${season}`)
+  const sessionId = localStorage.getItem('yahoo_session')
+  const sessionParam = sessionId ? `&session=${sessionId}` : ''
+  return api.post(`/leagues/?league_id=${leagueId}&season=${season}${sessionParam}`)
 }
 
 export const getLeagues = (season = null) => {
@@ -75,6 +77,23 @@ export const getTeamEfficiency = (teamId, week, season = 2024) => {
 // Health check
 export const healthCheck = () => {
   return api.get('/health')
+}
+
+// OAuth / Authentication
+export const getYahooAuthUrl = () => {
+  return `${API_URL}/auth/yahoo`
+}
+
+export const getCurrentUser = (sessionId) => {
+  return axios.get(`${API_URL}/auth/me`, {
+    params: { session: sessionId }
+  })
+}
+
+export const logout = (sessionId) => {
+  return axios.post(`${API_URL}/auth/logout`, null, {
+    params: { session: sessionId }
+  })
 }
 
 export default api

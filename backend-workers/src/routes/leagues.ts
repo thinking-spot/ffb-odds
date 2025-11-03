@@ -3,6 +3,7 @@ import { Env, LeagueSchema, TeamSchema } from '../models/schemas';
 import { DatabaseQueries } from '../db/queries';
 import { YahooFantasyService } from '../services/yahoo';
 import { CacheService } from '../services/cache';
+import { refreshAccessToken } from './oauth';
 
 const leagues = new Hono<{ Bindings: Env }>();
 
@@ -10,6 +11,7 @@ leagues.post('/', async (c) => {
   try {
     const leagueId = c.req.query('league_id');
     const season = parseInt(c.req.query('season') || '2024');
+    const sessionId = c.req.query('session');
 
     if (!leagueId) {
       return c.json({ error: 'league_id is required' }, 400);
@@ -17,7 +19,41 @@ leagues.post('/', async (c) => {
 
     const db = new DatabaseQueries(c.env.DB);
     const cache = new CacheService(c.env.CACHE);
-    const yahooService = new YahooFantasyService();
+
+    // Get user's OAuth token if session provided
+    let accessToken: string | undefined;
+    if (sessionId) {
+      const sessionData = await c.env.CACHE.get(`session:${sessionId}`, 'json') as any;
+      if (sessionData?.user_id) {
+        let tokenData = await db.getOAuthToken(sessionData.user_id);
+
+        if (tokenData) {
+          // Check if token is expired
+          const now = Math.floor(Date.now() / 1000);
+          if (tokenData.expires_at < now) {
+            // Token expired, refresh it
+            const refreshed = await refreshAccessToken(
+              tokenData.refresh_token,
+              c.env.YAHOO_CLIENT_ID,
+              c.env.YAHOO_CLIENT_SECRET
+            );
+
+            // Update token in database
+            await db.updateOAuthToken(
+              sessionData.user_id,
+              refreshed.access_token,
+              now + refreshed.expires_in
+            );
+
+            accessToken = refreshed.access_token;
+          } else {
+            accessToken = tokenData.access_token;
+          }
+        }
+      }
+    }
+
+    const yahooService = new YahooFantasyService(accessToken);
 
     // Fetch league from Yahoo
     const league = await yahooService.getLeague(leagueId, season);

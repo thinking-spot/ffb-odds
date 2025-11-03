@@ -217,9 +217,12 @@ export interface Env {
   ODDS_API_KEY: string;
   NFL_API_KEY: string;
   NFL_API_HOST: string;
+  YAHOO_CLIENT_ID: string;
+  YAHOO_CLIENT_SECRET: string;
 
   // Variables
   ENVIRONMENT: string;
   CURRENT_SEASON: string;
   DEFAULT_WEEK: string;
+  FRONTEND_URL: string;
 }

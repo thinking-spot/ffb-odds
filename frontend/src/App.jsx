@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import Matchups from './pages/Matchups'
 import Rankings from './pages/Rankings'
+import OAuthCallback from './pages/OAuthCallback'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/matchups" element={<Matchups />} />
             <Route path="/rankings" element={<Rankings />} />
+            <Route path="/auth/callback" element={<OAuthCallback />} />
           </Routes>
         </main>
 

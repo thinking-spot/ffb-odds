@@ -7,6 +7,7 @@ import leagues from './routes/leagues';
 import matchups from './routes/matchups';
 import odds from './routes/odds';
 import efficiency from './routes/efficiency';
+import oauth from './routes/oauth';
 
 // Import scheduled tasks
 import { dailyUpdate } from './scheduled/dailyUpdate';
@@ -27,6 +28,7 @@ app.route('/api/v1/leagues', leagues);
 app.route('/api/v1/matchups', matchups);
 app.route('/api/v1/odds', odds);
 app.route('/api/v1/efficiency', efficiency);
+app.route('/auth', oauth);
 
 // Root endpoint
 app.get('/', (c) => {
@@ -40,6 +42,7 @@ app.get('/', (c) => {
       matchups: '/api/v1/matchups',
       odds: '/api/v1/odds',
       efficiency: '/api/v1/efficiency',
+      auth: '/auth',
     },
   });
 });

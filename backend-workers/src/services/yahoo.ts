@@ -2,12 +2,17 @@ import { League, Team, Player, Matchup } from '../models/schemas';
 
 export class YahooFantasyService {
   private baseUrl = 'https://fantasysports.yahooapis.com/fantasy/v2';
+  private accessToken?: string;
+
+  constructor(accessToken?: string) {
+    this.accessToken = accessToken;
+  }
 
   async getLeague(leagueId: string, season: number = 2024): Promise<League | null> {
     try {
-      // Yahoo Fantasy API requires OAuth for private leagues
-      // For public leagues, we'd need to use their public endpoints or scraping
-      // This is a placeholder implementation showing the structure
+      if (!this.accessToken) {
+        throw new Error('OAuth token required to access Yahoo Fantasy leagues');
+      }
 
       const leagueData = await this.fetchLeagueMetadata(leagueId, season);
       const teamsData = await this.fetchTeams(leagueId, season);
@@ -31,30 +36,64 @@ export class YahooFantasyService {
   }
 
   private async fetchLeagueMetadata(leagueId: string, season: number): Promise<any> {
-    // Placeholder - would make actual Yahoo API call
+    const leagueKey = formatYahooLeagueKey(leagueId, season);
+    const url = `${this.baseUrl}/league/${leagueKey}/metadata?format=json`;
+
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Yahoo API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const league = data.fantasy_content.league[0];
+
     return {
-      name: 'My Fantasy League',
-      current_week: 10,
-      num_teams: 12,
-      scoring_type: 'ppr',
+      name: league.name,
+      current_week: parseInt(league.current_week),
+      num_teams: parseInt(league.num_teams),
+      scoring_type: league.scoring_type || 'standard',
     };
   }
 
   private async fetchTeams(leagueId: string, season: number): Promise<Team[]> {
-    // Placeholder - would make actual Yahoo API call
-    const teams: Team[] = [];
+    const leagueKey = formatYahooLeagueKey(leagueId, season);
+    const url = `${this.baseUrl}/league/${leagueKey}/teams?format=json`;
 
-    for (let i = 1; i <= 12; i++) {
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Yahoo API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const teamsData = data.fantasy_content.league[1].teams;
+
+    const teams: Team[] = [];
+    for (const [key, value] of Object.entries(teamsData)) {
+      if (key === 'count') continue;
+
+      const teamData = (value as any).team[0];
       teams.push({
-        team_id: `${leagueId}_team_${i}`,
+        team_id: teamData.team_key,
         league_id: leagueId,
-        name: `Team ${i}`,
-        manager_name: `Manager ${i}`,
-        wins: 0,
-        losses: 0,
-        ties: 0,
-        points_for: 0,
-        points_against: 0,
+        name: teamData.name,
+        manager_name: teamData.managers?.[0]?.manager?.nickname || 'Unknown',
+        wins: parseInt(teamData.team_standings?.outcome_totals?.wins || '0'),
+        losses: parseInt(teamData.team_standings?.outcome_totals?.losses || '0'),
+        ties: parseInt(teamData.team_standings?.outcome_totals?.ties || '0'),
+        points_for: parseFloat(teamData.team_points?.total || '0'),
+        points_against: 0, // Calculate from matchups
         roster: [],
       });
     }

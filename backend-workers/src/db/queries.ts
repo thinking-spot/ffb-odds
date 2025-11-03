@@ -270,4 +270,49 @@ export class DatabaseQueries {
       .first();
     return result;
   }
+
+  // ===== OAuth Tokens =====
+  async upsertOAuthToken(token: {
+    user_id: string;
+    access_token: string;
+    refresh_token: string;
+    token_type: string;
+    expires_at: number;
+    yahoo_guid?: string;
+  }): Promise<void> {
+    await this.db
+      .prepare(
+        `INSERT OR REPLACE INTO oauth_tokens
+         (user_id, access_token, refresh_token, token_type, expires_at, yahoo_guid)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      )
+      .bind(
+        token.user_id,
+        token.access_token,
+        token.refresh_token,
+        token.token_type,
+        token.expires_at,
+        token.yahoo_guid || null
+      )
+      .run();
+  }
+
+  async getOAuthToken(userId: string): Promise<any> {
+    const result = await this.db
+      .prepare('SELECT * FROM oauth_tokens WHERE user_id = ?')
+      .bind(userId)
+      .first();
+    return result;
+  }
+
+  async updateOAuthToken(userId: string, accessToken: string, expiresAt: number): Promise<void> {
+    await this.db
+      .prepare('UPDATE oauth_tokens SET access_token = ?, expires_at = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?')
+      .bind(accessToken, expiresAt, userId)
+      .run();
+  }
+
+  async deleteOAuthToken(userId: string): Promise<void> {
+    await this.db.prepare('DELETE FROM oauth_tokens WHERE user_id = ?').bind(userId).run();
+  }
 }
