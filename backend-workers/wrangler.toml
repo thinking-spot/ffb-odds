@@ -24,7 +24,7 @@ crons = ["0 15 * * *"]  # 3pm UTC = 10am EST / 11am EDT
 ENVIRONMENT = "production"
 CURRENT_SEASON = "2024"
 DEFAULT_WEEK = "10"
-FRONTEND_URL = "https://ffb-odds.pages.dev"
+FRONTEND_URL = "https://ffb-odds-813.pages.dev"
 
 # Secrets (set via: wrangler secret put <NAME>)
 # ODDS_API_KEY
