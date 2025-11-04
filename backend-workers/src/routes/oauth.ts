@@ -30,6 +30,7 @@ oauth.get('/yahoo', async (c) => {
   authUrl.searchParams.set('client_id', clientId);
   authUrl.searchParams.set('redirect_uri', redirectUri);
   authUrl.searchParams.set('response_type', 'code');
+  authUrl.searchParams.set('scope', 'openid');
   authUrl.searchParams.set('language', 'en-us');
   authUrl.searchParams.set('state', state);
 
